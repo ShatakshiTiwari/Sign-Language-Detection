@@ -7,14 +7,9 @@ pipeline {
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
   }
   
+  
   stages {
-
-    stage('Verify AWS CLI Installation') {
-            steps {
-                sh 'which aws'
-            }
-    }
-
+    
     stage('Continuous Integration') {
       steps {
         script {
