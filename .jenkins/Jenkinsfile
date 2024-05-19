@@ -8,12 +8,11 @@ pipeline {
   }
   
   stages {
+
     stage('Verify AWS CLI Installation') {
-      steps {
-        script {
-          sh 'aws --version'
-        }
-      }
+            steps {
+                sh 'which aws'
+            }
     }
 
     stage('Continuous Integration') {
