@@ -8,6 +8,14 @@ pipeline {
   }
   
   stages {
+    stage('Verify AWS CLI Installation') {
+      steps {
+        script {
+          sh 'aws --version'
+        }
+      }
+    }
+  stages {
     stage('Continuous Integration') {
       steps {
         script {
@@ -47,7 +55,7 @@ pipeline {
     stage('Continuous Deployment') {
       steps {
         sshagent(['ssh_key']) {
-          sh "ssh -o StrictHostKeyChecking=no -l ubuntu 107.21.43.212 'cd /home/ubuntu/ && wget  https://github.com/ShatakshiTiwari/Sign-Language-Detection/blob/main/docker-compose.yml && export IMAGE_NAME=${ECR_REPOSITORY}:latest && aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com && docker compose up -d '"
+          sh "ssh -o StrictHostKeyChecking=no -l ubuntu 107.21.43.212 'cd /home/ubuntu/ && wget https://raw.githubusercontent.com/ShatakshiTiwari/Sign-Language-Detection/main/docker-compose.yml && export IMAGE_NAME=${ECR_REPOSITORY}:latest && aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com && docker compose up -d '"
         }
       }
     }
