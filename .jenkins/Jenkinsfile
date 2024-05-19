@@ -15,8 +15,7 @@ pipeline {
         }
       }
     }
-  }
-  stages {
+
     stage('Continuous Integration') {
       steps {
         script {
