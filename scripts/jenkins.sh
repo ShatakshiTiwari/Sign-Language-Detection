@@ -45,4 +45,4 @@ aws configure
 ## For getting the admin password for jenkins
 
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
-#5c63572ddcc7461bac1a8f026475438c
+#6551d571d85a41aea9aae5cc7fdc0cf0
