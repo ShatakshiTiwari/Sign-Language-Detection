@@ -4,5 +4,3 @@ services:
     image: "${IMAGE_NAME}"
     ports:
       - "8080:8080"
-    volumes:
-      - /home/shatakshi/Downloads/End-to-end-Object-Detection-Project-main/log:/app/logs
