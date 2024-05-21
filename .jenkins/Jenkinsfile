@@ -7,72 +7,61 @@ pipeline {
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
   }
   
- stages {
-         stage('Checkout SCM') {
+   stages {
+        stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        stage('Continuous Integration') {
+
+        stage('Build') {
             steps {
                 script {
-                    echo 'Linting repository'
-                    // Add linting commands here
-                    echo 'Running unit tests'
-                    // Add unit test commands here
+                    docker.build("${IMAGE_NAME}")
                 }
             }
         }
-        stage('Login to ECR') {
+
+        stage('Push') {
             steps {
                 script {
-                    sh '''
-                        aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin ****.dkr.ecr.eu-north-1.amazonaws.com
-                    '''
+                    docker.withRegistry("https://${REGISTRY}", "${REGISTRY_CREDENTIALS}") {
+                        docker.image("${IMAGE_NAME}").push()
+                    }
                 }
             }
         }
-        stage('Build Image') {
+
+        stage('Deploy') {
             steps {
                 script {
-                    sh 'docker build -t ****:latest .'
-                }
-            }
-        }
-        stage('Push Image') {
-            steps {
-                script {
-                    sh 'docker push ****:latest'
-                }
-            }
-        }
-        stage('Continuous Deployment') {
-            steps {
-                sshagent(['jenkins']) {
-                    script {
-                        sh '''#!/bin/bash
-                            ssh -o StrictHostKeyChecking=no -l ubuntu 13.49.184.78 <<'EOF'
-                            docker-compose -f docker-compose.yml -f docker-compose.elk.yml pull
-                            docker-compose -f docker-compose.yml -f docker-compose.elk.yml up -d
+                    sshagent([SSH_CREDENTIALS_ID]) {
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ${DEPLOYMENT_SERVER} << 'EOF'
+                            echo "Navigating to deployment directory: ${DEPLOYMENT_DIRECTORY}"
+                            cd ${DEPLOYMENT_DIRECTORY} || { echo "Failed to change directory"; exit 1; }
+                            echo "Pulling the latest Docker images"
+                            docker-compose pull || { echo "Failed to pull Docker images"; exit 1; }
+                            echo "Restarting services"
+                            docker-compose up -d || { echo "Failed to restart services"; exit 1; }
+                            echo "Deployment complete"
 EOF
-                        '''
+                        """
                     }
                 }
             }
         }
     }
+
     post {
         always {
-            script {
-                echo 'Cleaning up Docker resources'
-                sh 'docker system prune -f'
-            }
+            cleanWs()
+        }
+        success {
+            echo 'Deployment completed successfully!'
         }
         failure {
-            script {
-                echo 'Build failed!'
-                // Add any additional failure handling steps here
-            }
+            echo 'Deployment failed.'
         }
     }
 }
