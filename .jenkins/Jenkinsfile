@@ -8,7 +8,7 @@ pipeline {
   }
   
  stages {
-        stage('Checkout SCM') {
+         stage('Checkout SCM') {
             steps {
                 checkout scm
             }
@@ -50,10 +50,10 @@ pipeline {
             steps {
                 sshagent(['jenkins']) {
                     script {
-                        sh '''
+                        sh '''#!/bin/bash
                             ssh -o StrictHostKeyChecking=no -l ubuntu 13.49.184.78 <<'EOF'
-                                docker-compose -f docker-compose.yml -f docker-compose.elk.yml pull
-                                docker-compose -f docker-compose.yml -f docker-compose.elk.yml up -d
+                            docker-compose -f docker-compose.yml -f docker-compose.elk.yml pull
+                            docker-compose -f docker-compose.yml -f docker-compose.elk.yml up -d
 EOF
                         '''
                     }
