@@ -13,13 +13,15 @@ log_handler.setLevel(logging.INFO)
 log_formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
 log_handler.setFormatter(log_formatter)
 
-app = Flask(_name_)
+class ClientApp:
+    def __init__(self):
+        self.filename = "inputImage.jpg"
+
+app = Flask(__name__)
 app.logger.addHandler(log_handler)
 CORS(app)
 
-class ClientApp:
-    def _init_(self):
-        self.filename = "inputImage.jpg"
+clApp = ClientApp()
 
 @app.route("/")
 def home():
@@ -36,7 +38,7 @@ def trainRoute():
         app.logger.error("Error during training: %s", str(e))
         return "Training Failed"
 
-@app.route("/predict", methods=['POST','GET'])
+@app.route("/predict", methods=['POST', 'GET'])
 @cross_origin()
 def predictRoute():
     try:
@@ -70,6 +72,6 @@ def predictLive():
         app.logger.error("Value error: %s", str(val))
         return Response("Value not found inside json data")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     clApp = ClientApp()
     app.run(host="0.0.0.0", port=8080)
