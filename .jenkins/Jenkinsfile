@@ -13,58 +13,72 @@ pipeline {
         script {
           echo "Linting repository"
           echo "Running unit tests"
+          // Add actual linting and testing commands here
         }
       }
     }
+
 
     stage('Login to ECR') {
       steps {
         script {
+          echo "Logging in to ECR"
           sh 'aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.eu-north-1.amazonaws.com'
         }
-
       }
     }
+
 
     stage('Build Image') {
       steps {
         script {
+          echo "Building Docker image"
           sh 'docker build -t ${ECR_REPOSITORY}:latest .'
         }
-
       }
     }
 
     stage('Push Image') {
       steps {
         script {
+          echo "Pushing Docker image to ECR"
           sh 'docker push ${ECR_REPOSITORY}:latest'
         }
-
       }
     }
 
     stage('Continuous Deployment') {
       steps {
         sshagent(['ssh_key']) {
-          sh '''
-          ssh -o StrictHostKeyChecking=no -l ubuntu 13.49.184.78 << EOF
-          cd /home/ubuntu/
-          wget https://raw.githubusercontent.com/ShatakshiTiwari/Sign-Language-Detection/main/docker-compose.yml
-          wget https://raw.githubusercontent.com/ShatakshiTiwari/Sign-Language-Detection/main/docker-compose.elk.yml
-          export IMAGE_NAME=${ECR_REPOSITORY}:latest
-          aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.eu-north-1.amazonaws.com
-          docker-compose -f docker-compose.yml -f docker-compose.elk.yml up -d
-          EOF
-          '''
+          script {
+            echo "Deploying to remote server"
+            sh '''
+              ssh -o StrictHostKeyChecking=no -l ubuntu 13.49.184.78 "
+                cd /home/ubuntu/ && 
+                wget -q https://raw.githubusercontent.com/ShatakshiTiwari/Sign-Language-Detection/main/docker-compose.yml && 
+                wget -q https://raw.githubusercontent.com/ShatakshiTiwari/Sign-Language-Detection/main/docker-compose.elk.yml
+              "
+            '''
+            sh '''
+              ssh -o StrictHostKeyChecking=no -l ubuntu 13.49.184.78 "
+                export IMAGE_NAME=${ECR_REPOSITORY}:latest &&
+                aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.eu-north-1.amazonaws.com &&
+                IMAGE_NAME=${ECR_REPOSITORY}:latest docker-compose -f /home/ubuntu/docker-compose.yml -f /home/ubuntu/docker-compose.elk.yml up -d
+              "
+            '''
+          }
         }
       }
     }
   }
 
-  post {
+
+   post {
     always {
-      sh 'docker system prune -f'
+      script {
+        echo "Cleaning up Docker system"
+        sh 'docker system prune -f'
+      }
     }
   }
 }
