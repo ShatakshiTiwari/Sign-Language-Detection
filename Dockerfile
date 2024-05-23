@@ -21,4 +21,4 @@ RUN ls -l /app/yolov5
 RUN pip install -r requirements.txt
 
 # Set the default command to run the application
-CMD ["python3", "app.py"]  
+CMD ["python3", "app.py"]
