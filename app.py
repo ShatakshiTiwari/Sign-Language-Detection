@@ -18,7 +18,7 @@ app.logger.addHandler(log_handler)
 CORS(app)
 
 class ClientApp:
-    def _init_(self):
+    def __init__(self):
         self.filename = "inputImage.jpg"
 
 clApp = ClientApp()
@@ -94,5 +94,5 @@ def predictLive():
         app.logger.error("Unexpected error: %s", str(e))
         return Response("Unexpected Error", status=500)
 
-if __name__ == "_main_":
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
