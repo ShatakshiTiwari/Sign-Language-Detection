@@ -1,4 +1,4 @@
-# End-to-end-Object-Detection-Project
+# Sign-Language-Detection-with-DevOps 
 
 
 ## Workflows
