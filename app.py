@@ -13,7 +13,7 @@ log_handler.setLevel(logging.INFO)
 log_formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
 log_handler.setFormatter(log_formatter)
 
-app = Flask(_name_)
+app = Flask(__name__)
 app.logger.addHandler(log_handler)
 CORS(app)
 
@@ -94,5 +94,5 @@ def predictLive():
         app.logger.error("Unexpected error: %s", str(e))
         return Response("Unexpected Error", status=500)
 
-if _name_ == "_main_":
+if __name__ == "_main_":
     app.run(host="0.0.0.0", port=8080)
