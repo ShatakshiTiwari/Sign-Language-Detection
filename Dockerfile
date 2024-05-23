@@ -1,15 +1,24 @@
 FROM python:3.7-slim-buster
 
 # Install necessary packages
-RUN apt update -y && apt install -y \
+RUN apt-get update && apt-get install -y \
     awscli \
-    git
+    git \
+    libpng-dev \
+    libfreetype6-dev \
+    libblas-dev \
+    liblapack-dev \
+    libatlas-base-dev \
+    gfortran \
+    gcc \
+    musl-dev \
+    libgl1-mesa-glx
 
 # Set the working directory
 WORKDIR /app
 
 # Clone the YOLOv5 repository
-RUN git clone https://github.com/ultralytics/yolov5.git
+RUN git clone https://github.com/ultralytics/yolov5.git /app/yolov5
 
 # Copy all other files to the working directory except for yolov5
 COPY . /app
