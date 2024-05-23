@@ -6,7 +6,8 @@ RUN apt update -y && apt install awscli -y
 # Set the working directory
 WORKDIR /app
 
-RUN git clone https://github.com/ultralytics/yolov5.git
+# Explicitly copy the yolov5 directory and its contents
+COPY yolov5 /app/yolov5
 
 # Copy all other files to the working directory except for yolov5
 COPY . /app
