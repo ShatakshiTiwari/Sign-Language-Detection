@@ -6,8 +6,7 @@ RUN apt update -y && apt install awscli -y
 # Set the working directory
 WORKDIR /app
 
-# Explicitly copy the yolov5 directory and its contents
-COPY yolov5 /app/yolov5
+RUN git clone https://github.com/ultralytics/yolov5.git
 
 # Copy all other files to the working directory except for yolov5
 COPY . /app
@@ -22,4 +21,4 @@ RUN ls -l /app/yolov5
 RUN pip install -r requirements.txt
 
 # Set the default command to run the application
-CMD ["python3", "app.py"]
+CMD ["python3", "app.py"]  
