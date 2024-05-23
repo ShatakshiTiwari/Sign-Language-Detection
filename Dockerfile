@@ -1,13 +1,15 @@
 FROM python:3.7-slim-buster
 
 # Install necessary packages
-RUN apt update -y && apt install awscli -y
+RUN apt update -y && apt install -y \
+    awscli \
+    git
 
 # Set the working directory
 WORKDIR /app
 
-# Explicitly copy the yolov5 directory and its contents
-COPY yolov5 /app/yolov5
+# Clone the YOLOv5 repository
+RUN git clone https://github.com/ultralytics/yolov5.git
 
 # Copy all other files to the working directory except for yolov5
 COPY . /app
